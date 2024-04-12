@@ -3,7 +3,6 @@ package controllers
 import (
 	"example/blog-app/app/models"
 	"example/blog-app/app/repositories"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -42,7 +41,6 @@ func (c *BlogController) GetBlogByID(ctx *gin.Context) {
 func (c *BlogController) CreateBlog(ctx *gin.Context) {
 	var blog models.Blog
 	ctx.BindJSON(&blog)
-	fmt.Println(blog)
 	blog, err := c.repo.CreateBlog(blog)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create a blog"})
