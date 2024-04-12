@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ func GenerateToken(username string, password string) (string, error) {
 		"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 
-	privateKey := []byte("my-secret-key")
+	privateKey := []byte(os.Getenv("KEY"))
 
 	tokenString, err := token.SignedString(privateKey)
 
@@ -28,8 +29,7 @@ func Decode(tokenString string) (*jwt.Token, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-
-		return []byte("my-secret-key"), nil
+		return []byte(os.Getenv("KEY")), nil
 	})
 	return token, err
 }
