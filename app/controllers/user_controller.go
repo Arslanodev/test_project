@@ -35,6 +35,13 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 		return
 	}
 
+	// Check if user exists
+	user, _ := c.repo.GetUserByUsername(body.Username)
+	if user.ID != 0 {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "User already exists"})
+		return
+	}
+
 	// Hash the password
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 
