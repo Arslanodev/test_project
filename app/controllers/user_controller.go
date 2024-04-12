@@ -4,6 +4,7 @@ import (
 	"example/blog-app/app/models"
 	"example/blog-app/app/repositories"
 	"example/blog-app/auth"
+	"log"
 	"net/http"
 	"time"
 
@@ -37,12 +38,16 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 	}
 
 	// Check if user exists
-	user, _ := c.repo.GetUserByUsername(body.Username)
+	user, err := c.repo.GetUserByUsername(body.Username)
 	if user.Username == body.Username {
 		ctx.AbortWithStatusJSON(http.StatusConflict, gin.H{
 			"message": "User already exists",
 		})
 		return
+	}
+
+	if err != nil {
+		log.Println("Identical User not found")
 	}
 
 	// Hash the password
@@ -165,7 +170,9 @@ func (c *UserController) RequireAuth(ctx *gin.Context) {
 		// Check the exp
 		exp := int64(claims["exp"].(float64))
 		if time.Now().Unix() > exp {
-			ctx.AbortWithStatus(http.StatusUnauthorized)
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"message": "Token expired",
+			})
 		}
 
 		// Attach to req
