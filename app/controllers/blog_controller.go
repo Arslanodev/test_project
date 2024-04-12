@@ -24,6 +24,11 @@ func (c *PostController) GetPosts(ctx *gin.Context) {
 		return
 	}
 
+	if len(blogs) == 0 {
+		ctx.JSON(http.StatusOK, gin.H{"message": "There are no posts yet"})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, blogs)
 }
 
@@ -32,6 +37,11 @@ func (c *PostController) GetPostByID(ctx *gin.Context) {
 	blog, err := c.repo.GetPostByID(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch blog by id"})
+		return
+	}
+
+	if blog.ID == 0 {
+		ctx.JSON(http.StatusOK, gin.H{"message": "There is no post at that id"})
 		return
 	}
 
@@ -52,7 +62,15 @@ func (c *PostController) CreatePost(ctx *gin.Context) {
 
 func (c *PostController) DeletePost(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
+	post, _ := c.repo.GetPostByID(id)
+	if post.ID == 0 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "There is no post at that id to delete",
+		})
+		return
+	}
 	err := c.repo.DeletePost(id)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete a blog"})
 		return
