@@ -11,18 +11,18 @@ import (
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
-	blogRepo := repositories.NewBlogRepository(db)
-	blogController := controllers.NewBlogControllers(*blogRepo)
+	postRepo := repositories.NewPostRepository(db)
+	postController := controllers.NewPostControllers(*postRepo)
 
 	userRepo := repositories.NewUserRepository(db)
 	userController := controllers.NewUserController(*userRepo)
 
-	blog_route := r.Group("api/v1/blog", userController.RequireAuth)
+	post_route := r.Group("api/v1/post", userController.RequireAuth)
 
-	blog_route.GET("/", blogController.GetBlogs)
-	blog_route.GET("/:id", blogController.GetBlogByID)
-	blog_route.POST("/", userController.IsAdmin, blogController.CreateBlog)
-	blog_route.DELETE("/:id", userController.IsAdmin, blogController.DeleteBlog)
+	post_route.GET("/", postController.GetPosts)
+	post_route.GET("/:id", postController.GetPostByID)
+	post_route.POST("/", userController.IsAdmin, postController.CreatePost)
+	post_route.DELETE("/:id", userController.IsAdmin, postController.DeletePost)
 
 	auth_route := r.Group("api/v1/user")
 	auth_route.POST("/register", userController.RegisterUser)

@@ -1,17 +1,17 @@
 ### Endpoints
 **Blog operations**  
-`GET`: `api/v1/blog` - returns all blogs  
+`GET`: `api/v1/post` - returns all posts  
 
-`GET`: `api/v1/blog/{id}` - returns blog at id  
+`GET`: `api/v1/post/{id}` - returns post at id  
 
-`POST`: `api/v1/blog` - creates a new blog. (Admin restricted). Request body:  
+`POST`: `api/v1/post` - creates a new post. (Admin restricted). Request body:  
 ```json
 {
     "title" : "This is a Title",
     "text": "This a new text"
 }
 ```
-`DELETE`: `api/v1/blog/{id}` - deletes blog at id. (Admin restricted)
+`DELETE`: `api/v1/post/{id}` - deletes post at id. (Admin restricted)
 
 **User operations**  
 `POST`: `api/v1/user/register` - Creates a new user. Request body:  
@@ -31,9 +31,9 @@
 }
 ```
 **Authentication**  
-All requests to the `api/v1/blog` endpoint are available only to authorized users. To be authorized, user should request a token by logging in with *username* and *password*.  
+All requests to the `api/v1/post` endpoint are available only to authorized users. To be authorized, user should request a token by logging in with *username* and *password*.  
 
-Each request to the `api/v1/blog` should contain `"Authorization"` header with token as value.
+Each request to the `api/v1/post` should contain `"Authorization"` header with bearer token as value.
 
 ### dependencies:
 - Gorm

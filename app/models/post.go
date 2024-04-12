@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Blog struct {
+type Post struct {
 	*gorm.Model
 	ID    uint `gorm:"primaryKey"`
 	Title string
