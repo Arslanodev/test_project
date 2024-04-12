@@ -1,4 +1,6 @@
 ### Endpoints
+To run this application simply run `go run .` in the main project folder
+
 **Blog operations**  
 `GET`: `api/v1/post` - returns all posts  
 
