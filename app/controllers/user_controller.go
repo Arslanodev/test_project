@@ -57,7 +57,7 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 	}
 
 	// Create user
-	result := c.repo.RegisterUser(models.User{Username: body.Username, Password: string(hash), Admin: body.Admin})
+	result := c.repo.RegisterUser(models.User{Name: body.Name, Username: body.Username, Password: string(hash), Admin: body.Admin})
 
 	if result != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -131,6 +131,7 @@ func (c *UserController) RequireAuth(ctx *gin.Context) {
 		return
 	}
 	// Decode
+	tokenString = tokenString[len("Bearer "):]
 	token, err := auth.Decode(tokenString)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid Token"})
