@@ -22,6 +22,7 @@ func NewUserController(repo repositories.UserRepository) *UserController {
 
 func (c *UserController) RegisterUser(ctx *gin.Context) {
 	var body struct {
+		Name     string
 		Username string
 		Password string
 		Admin    bool
@@ -37,8 +38,10 @@ func (c *UserController) RegisterUser(ctx *gin.Context) {
 
 	// Check if user exists
 	user, _ := c.repo.GetUserByUsername(body.Username)
-	if user.ID != 0 {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "User already exists"})
+	if user.Username == body.Username {
+		ctx.AbortWithStatusJSON(http.StatusConflict, gin.H{
+			"message": "User already exists",
+		})
 		return
 	}
 
@@ -83,7 +86,6 @@ func (c *UserController) LoginUser(ctx *gin.Context) {
 	}
 	// Look up requested user
 	user, _ := c.repo.GetUserByUsername(body.Username)
-
 	if user.ID == 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid email or password",
@@ -92,7 +94,7 @@ func (c *UserController) LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	// Compare sent in pass with saved user pass has
+	// Compare sent in pass with saved user pass
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
 	if err != nil {
@@ -103,7 +105,7 @@ func (c *UserController) LoginUser(ctx *gin.Context) {
 		return
 	}
 	// Generate a jwt token
-	token, err := auth.GenerateToken(user.ID)
+	token, err := auth.GenerateToken(user.Username, user.Password)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -128,24 +130,40 @@ func (c *UserController) RequireAuth(ctx *gin.Context) {
 
 		return
 	}
-	// Decode/validate it
+	// Decode
 	token, err := auth.Decode(tokenString)
 	if err != nil {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid Token"})
+		return
 	}
 
+	// Validate
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		// Find the user with token username
+		var user models.User
+		username := claims["username"]
+		password := claims["password"]
+
+		if username == nil {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		user, _ = c.repo.GetUserByUsername(username.(string))
+
+		// Check if user exists
+		if user.Username != username {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid Token"})
+			return
+		}
+
+		// Check password
+		if password != user.Password {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid Token"})
+		}
+
 		// Check the exp
 		exp := int64(claims["exp"].(float64))
 		if time.Now().Unix() > exp {
-			ctx.AbortWithStatus(http.StatusUnauthorized)
-		}
-
-		// Find the user with token sub
-		var user models.User
-		user_id := int(claims["sub"].(float64))
-		user, _ = c.repo.GetUserById(user_id)
-		if user.ID == 0 {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 		}
 

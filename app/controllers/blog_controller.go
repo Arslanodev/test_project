@@ -10,22 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type BlogController interface {
-	GetBlogs() ([]models.Blog, error)
-	GetBlogById() (models.Blog, error)
-	CreateBlog() (models.Blog, error)
-	DeleteBlog() error
-}
-
-type blog_controller struct {
+type BlogController struct {
 	repo repositories.BlogRepository
 }
 
-func NewBlogControllers(repo repositories.BlogRepository) *blog_controller {
-	return &blog_controller{repo: repo}
+func NewBlogControllers(repo repositories.BlogRepository) *BlogController {
+	return &BlogController{repo: repo}
 }
 
-func (c *blog_controller) GetBlogs(ctx *gin.Context) {
+func (c *BlogController) GetBlogs(ctx *gin.Context) {
 	blogs, err := c.repo.GetBlogs()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch blogs"})
@@ -35,7 +28,7 @@ func (c *blog_controller) GetBlogs(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, blogs)
 }
 
-func (c *blog_controller) GetBlogByID(ctx *gin.Context) {
+func (c *BlogController) GetBlogByID(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	blog, err := c.repo.GetBlogByID(id)
 	if err != nil {
@@ -46,7 +39,7 @@ func (c *blog_controller) GetBlogByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, blog)
 }
 
-func (c *blog_controller) CreateBlog(ctx *gin.Context) {
+func (c *BlogController) CreateBlog(ctx *gin.Context) {
 	var blog models.Blog
 	ctx.BindJSON(&blog)
 	fmt.Println(blog)
@@ -59,7 +52,7 @@ func (c *blog_controller) CreateBlog(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, blog)
 }
 
-func (c *blog_controller) DeleteBlog(ctx *gin.Context) {
+func (c *BlogController) DeleteBlog(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	err := c.repo.DeleteBlog(id)
 	if err != nil {

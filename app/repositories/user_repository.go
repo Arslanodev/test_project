@@ -29,7 +29,6 @@ func (r *UserRepository) GetUserById(id int) (models.User, error) {
 }
 
 func (r *UserRepository) RegisterUser(user models.User) error {
-
 	err := r.db.Create(&user).Error
 
 	return err

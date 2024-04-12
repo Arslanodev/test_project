@@ -9,10 +9,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateToken(user_id uint) (string, error) {
+func GenerateToken(username string, password string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user_id,
-		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+		"username": username,
+		"password": password,
+		"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 
 	privateKey := []byte("my-secret-key")

@@ -10,6 +10,7 @@ import (
 
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
 
 	blogRepo := repositories.NewBlogRepository(db)
 	blogController := controllers.NewBlogControllers(*blogRepo)
