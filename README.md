@@ -1,5 +1,5 @@
 ### Endpoints
-To run this application simply run install packages with `go get .`. Then run `go run .` in the main project folder
+To run this application simply install packages with `go get .` Then run `go run .` in the main project folder
 
 **Blog operations**  
 `GET`: `api/v1/post` - returns all posts  
