@@ -1,5 +1,5 @@
 ### Endpoints
-To run this application simply run `make run` in the main project folder. If you want to build this project run 'make build'
+To run this application simply run `make run` in the main project folder. If you want to build this project run `make build`
 
 **Blog operations**  
 `GET`: `api/v1/post` - returns all posts  
