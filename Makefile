@@ -1,4 +1,5 @@
 run:
+	go get ./cmd/api
 	go run ./cmd/api/main.go
 
 build: 
